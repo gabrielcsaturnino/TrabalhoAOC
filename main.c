@@ -74,10 +74,13 @@ void busca(void){
 
 void decodifica(void){
     ir = mbr>>27;
-  
+ 
+
+  //ldbo stbo
   if(ir == 5 || ir ==6){
      ro0 = (mbr>>23) & 0xF;
      ro1 = (mbr>>19) & 0xF; 
+     mar = mbr & 0x7FFFF;
   }
 
   //ld e st
