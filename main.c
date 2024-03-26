@@ -132,7 +132,7 @@ void executa(void){
   }
   
   if(ir == 13){
-
+      
   }
 
 
@@ -161,9 +161,28 @@ void executa(void){
   else if (ir == 10){
     reg[ro2] = reg[ro1]|reg[ro0];
   } 
-  else if (ir == 10){
+  else if (ir == 11){
     reg[ro2] = reg[ro1]reg[ro0];
   }
+
+
+
+
+
+   if(ir == 16){
+     reg[ro0] = reg[ro0] + imm; 
+  }
+   if(ir == 17){
+     reg[ro0] = reg[ro0] - imm; 
+  } 
+    if(ir == 18){
+     reg[ro0] = reg[ro0] * imm; 
+  }
+    if(ir == 19){
+     reg[ro0] = reg[ro0] / imm; 
+  }
+
+
   pc = pc + 4;
 
 }
