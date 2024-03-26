@@ -52,8 +52,8 @@ int main(void) {
    mem[36] = 0x0;
    mem[37] = 0x10;
 
-
-   while(1){
+   bool x = true;
+   while(x){
    busca();
    decodifica();
    executa();
@@ -110,7 +110,10 @@ void decodifica(void){
     mar = mbr & 0xFF;
 
   }
-
+  
+  if(ir == 0){
+    x = false;
+  }
 
 
 }
@@ -127,13 +130,40 @@ void executa(void){
     reg[ro0] = mbr;
     
   }
-  //SOMAR
+  
+  if(ir == 13){
+
+  }
+
+
+    //SOMAR
   else if (ir == 5) {
      reg[ro2] = reg[ro1] + reg[ro0];
      printf("\n%i",reg[ro2]);
      
   }
 
+  else if (ir == 6){
+    reg[ro2] = reg[ro1] - reg[ro0];
+  }
+
+  else if(ir == 7){
+    reg[ro2] = reg[ro1] * reg[ro0];
+  }
+
+  else if(ir == 8){
+    reg[ro2] = reg[ro1]/reg[ro0];
+  }
+  
+  else if(ir == 9){
+    reg[ro2] = reg[ro1]&reg[ro0];
+  }
+  else if (ir == 10){
+    reg[ro2] = reg[ro1]|reg[ro0];
+  } 
+  else if (ir == 10){
+    reg[ro2] = reg[ro1]reg[ro0];
+  }
   pc = pc + 4;
 
 }
