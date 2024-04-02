@@ -119,7 +119,7 @@ void decodifica(void){
 }
 
 void executa(void){
-  //LOAD
+}  //LOAD
   if(ir == 12){
     mbr = mem[mar++];
     mbr = (mbr<<8) + mem[mar++];
@@ -132,7 +132,7 @@ void executa(void){
   }
   
   if(ir == 13){
-      
+   pc = 0;      
   }
 
 
@@ -185,4 +185,4 @@ void executa(void){
 
   pc = pc + 4;
 
-}
+
