@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+#include <stdbool.h>
 unsigned int mbr,
              mar,
              pc,
@@ -14,6 +14,7 @@ unsigned char ro0,
               ir, 
             mem[154];
 
+bool x = true;
 
 
 
@@ -27,17 +28,17 @@ void executa(void);
 
 int main(void) {
      pc = 0;
-   mem[0] = 0x60;
+   mem[0] = 0x70;
    mem[1] = 0x00;
    mem[2] = 0x00;
    mem[3] = 0x12;
    
-   mem[4] = 0x60;
+   mem[4] = 0x70;
    mem[5] = 0x80;
    mem[6] = 0x00;
    mem[7] = 0x22;
    
-   mem[8] = 0x29;
+   mem[8] = 0x39;
    mem[9] = 0x00;
    mem[10] = 0x80;
    mem[11] = 0x00;
@@ -52,7 +53,6 @@ int main(void) {
    mem[36] = 0x0;
    mem[37] = 0x10;
 
-   bool x = true;
    while(x){
    busca();
    decodifica();
@@ -63,40 +63,53 @@ int main(void) {
 
 
 void busca(void){
-    mar = pc;
+  mar = pc;
   mbr = mem[mar++];
   mbr = (mbr<<8) + mem[mar++];
   mbr = (mbr<<8) + mem[mar++];
   mbr = (mbr<<8) + mem[mar++];
-
+   
 }
 
 
 void decodifica(void){
     ir = mbr>>27;
- 
+     
+    printf("\nmbr:%x", mbr);
+    printf("\nir:%b", ir); 
+  if(ir == 0){
+    x = false;
+  }
+
 
   //ldbo stbo
-  if(ir == 5 || ir ==6){
+  if(ir == 5 || ir == 6){
      ro0 = (mbr>>23) & 0xF;
      ro1 = (mbr>>19) & 0xF; 
      mar = mbr & 0x7FFFF;
   }
 
-  //ld e st
-  if(ir==12 || ir ==13){
-    mar = mbr & 0xFF;    
-    ro0 = (mbr >> 23) & 0xF;
-    
-        
-  }
-  //sum
-  if(ir >= 5 && ir<=13){
+ 
+  if(ir >= 7 && ir<=13){
      ro1 = (mbr>>15) & 0xF;
      ro0 = (mbr>>19) & 0xF;
      ro2 = (mbr>>23) & 0xF;
+  
+     printf("\nro0:%x", ro0);
+     printf("\nro1:%x", ro1);
+     printf("\nro2:%x", ro2);    
+}
+
+ 
+  //ld e st
+  if(ir==14 || ir ==15){
+    mar = mbr & 0xFF;    
+    ro0 = (mbr >> 23) & 0xF;
+   
+        
   }
   
+ 
   //todos com imm
   if(ir >= 16 && ir<=23){
      ro0 = (mbr>>23) & 0xF; 
@@ -110,79 +123,103 @@ void decodifica(void){
     mar = mbr & 0xFF;
 
   }
-  
-  if(ir == 0){
-    x = false;
-  }
-
 
 }
 
 void executa(void){
-}  //LOAD
-  if(ir == 12){
+   
+
+ 
+   if(ir == 5){
+      reg[ro0] =*   
+  }
+   
+   if(ir == 7){
+     reg[ro2] = reg[ro1] + reg[ro0];
+     printf("\nresultado:%i",reg[ro2]);     
+  }
+
+   if (ir == 8){
+    reg[ro2] = reg[ro1] - reg[ro0];
+  }
+
+   if(ir == 9){
+    reg[ro2] = reg[ro1] * reg[ro0];
+  }
+
+   if(ir == 10){
+    reg[ro2] = reg[ro1]/reg[ro0];
+  }
+  
+   if(ir == 11){
+    reg[ro2] = reg[ro1]&reg[ro0];
+  }
+   if (ir == 12){
+    reg[ro2] = reg[ro1]|reg[ro0];
+      } 
+   if (ir == 13){
+    reg[ro2] = reg[ro1]^reg[ro0];
+  }
+
+
+
+
+  //LOAD
+  if(ir == 14){
     mbr = mem[mar++];
     mbr = (mbr<<8) + mem[mar++];
     mbr = (mbr<<8) + mem[mar++];
     mbr = (mbr<<8) + mem[mar++];
-
- 
     reg[ro0] = mbr;
     
   }
   
-  if(ir == 13){
-   pc = 0;      
-  }
-
-
-    //SOMAR
-  else if (ir == 5) {
-     reg[ro2] = reg[ro1] + reg[ro0];
-     printf("\n%i",reg[ro2]);
+  if(ir == 15){
+     mbr = reg[ro0++];
+     mbr = (mbr<<8) + reg[ro0++];
+     mbr = (mbr<<8) + reg[ro0++];
+     mbr = (mbr<<8) + reg[ro0++];
+    
      
   }
 
-  else if (ir == 6){
-    reg[ro2] = reg[ro1] - reg[ro0];
-  }
 
-  else if(ir == 7){
-    reg[ro2] = reg[ro1] * reg[ro0];
-  }
-
-  else if(ir == 8){
-    reg[ro2] = reg[ro1]/reg[ro0];
-  }
   
-  else if(ir == 9){
-    reg[ro2] = reg[ro1]&reg[ro0];
-  }
-  else if (ir == 10){
-    reg[ro2] = reg[ro1]|reg[ro0];
-  } 
-  else if (ir == 11){
-    reg[ro2] = reg[ro1]reg[ro0];
-  }
-
-
 
 
 
    if(ir == 16){
-     reg[ro0] = reg[ro0] + imm; 
-  }
-   if(ir == 17){
-     reg[ro0] = reg[ro0] - imm; 
+     
+    reg[ro0] &=0x0000FFFF;
+    reg[ro0] |=(imm&0xFFFF)<<16;
+    
   } 
-    if(ir == 18){
-     reg[ro0] = reg[ro0] * imm; 
-  }
-    if(ir == 19){
-     reg[ro0] = reg[ro0] / imm; 
+
+   if(ir == 17){
+    reg[ro0] = 0;
+    reg[ro0] = imm & 0x0000FFFF; 
   }
 
+   if(ir == 18){
+     reg[ro0] = reg[ro0] + imm; 
+  }
+   if(ir == 19){
+     reg[ro0] = reg[ro0] - imm; 
+  } 
+    if(ir == 20){
+     reg[ro0] = reg[ro0] * imm; 
+  }
+    if(ir == 21){
+    reg[ro0] = reg[ro0] / imm;
+  }
+    if(ir == 22){
+     reg[ro0] = reg[ro0] << imm; 
+  }
+    if(ir == 23){
+     reg[ro0] = reg[ro0] >> imm; 
+  }
 
   pc = pc + 4;
 
+}
 
