@@ -17,7 +17,7 @@ unsigned char ro0,
 bool x = true;
 
 
-
+void incremento(void);
 void busca(void);
 void decodifica(void);
 void executa(void);
@@ -77,11 +77,22 @@ void decodifica(void){
      
     printf("\nmbr:%x", mbr);
     printf("\nir:%b", ir); 
+  
+
   if(ir == 0){
     x = false;
   }
 
+   
+  if(ir == 2){
+    ro0 = (mbr>>23) & 0xF;
+  }
 
+
+  if(ir == 3 || ir == 4){
+    ro0 = (mbr>>19) & 0xF;
+    ro1 = (mbr>>15) & 0xF;
+  }
   //ldbo stbo
   if(ir == 5 || ir == 6){
      ro0 = (mbr>>23) & 0xF;
@@ -91,8 +102,8 @@ void decodifica(void){
 
  
   if(ir >= 7 && ir<=13){
-     ro1 = (mbr>>15) & 0xF;
-     ro0 = (mbr>>19) & 0xF;
+     ro0 = (mbr>>15) & 0xF;
+     ro1 = (mbr>>19) & 0xF;
      ro2 = (mbr>>23) & 0xF;
   
      printf("\nro0:%x", ro0);
@@ -127,16 +138,51 @@ void decodifica(void){
 }
 
 void executa(void){
-   
-
- 
-   if(ir == 5){
-      reg[ro0] =*   
+    
+   if(ir == 1){
+   incremento();
   }
    
-   if(ir == 7){
-     reg[ro2] = reg[ro1] + reg[ro0];
-     printf("\nresultado:%i",reg[ro2]);     
+   if(ir == 2){
+    reg[ro0] = !reg[ro0];
+  }
+
+   if(ir == 3 ){
+    reg[ro0] = reg[ro1];
+  }
+   
+  
+  if(ir == 4){
+    if(reg[ro0] == reg[ro1]){
+      e = 1;
+    }else{
+      e = 0;
+    }
+
+    if (reg[ro0]<reg[ro1]) {
+       l = 1;
+    }else{
+       l = 0; 
+    }
+
+    if (reg[ro0]>reg[ro1]) {
+        g = 1;
+    }else{
+        g = 0;
+  }    
+}
+
+   if(ir == 5){
+    reg[ro0] = (mem[mar]+reg[ro1]);
+  }
+
+  if(ir == 6){
+   /*(mem[mar]+reg[ro1]) = reg[ro0];*/
+  }
+ 
+  if(ir == 7){
+    reg[ro2] = reg[ro1] + reg[ro0];
+    printf("\nresultado:%i",reg[ro2]);     
   }
 
    if (ir == 8){
@@ -159,10 +205,7 @@ void executa(void){
       } 
    if (ir == 13){
     reg[ro2] = reg[ro1]^reg[ro0];
-  }
-
-
-
+  } 
 
   //LOAD
   if(ir == 14){
@@ -175,12 +218,19 @@ void executa(void){
   }
   
   if(ir == 15){
-     mbr = reg[ro0++];
-     mbr = (mbr<<8) + reg[ro0++];
-     mbr = (mbr<<8) + reg[ro0++];
-     mbr = (mbr<<8) + reg[ro0++];
-    
-     
+     mbr = reg[ro0];
+     /*
+      *
+      *mbr[01234567.....31]
+      * 
+      *
+      *
+      *
+      * */
+     mem[mar] = mbr & 0xFF;
+     mem[mar++] = mbr & 0xFFFF;
+     mem[mar++] = mbr & 0xFFFFFF;
+     mem[mar++] = mbr & 0xFFFFFFFF;
   }
 
 
@@ -219,7 +269,10 @@ void executa(void){
      reg[ro0] = reg[ro0] >> imm; 
   }
 
-  pc = pc + 4;
-
+ 
+ pc = pc + 4;
 }
 
+  void incremento(void){
+     pc = pc + 4;
+}
