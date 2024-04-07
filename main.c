@@ -32,6 +32,7 @@
 #define jge 0b11101;
 #define jmp 0b11110;
 
+
 unsigned int mbr,
              mar,
              pc,
@@ -57,53 +58,100 @@ void executa(void);
 
     
 int main(void) {
-     pc = 0;
+   
+   for(int i = 0;i<154; i++){
+    mem[i] = 0x0;
+  }
+   for(int i = 0;i<16;i++){
+    reg[i] = 0;
+  }
+    
+   pc = 0;
    mem[0] = 0x70;
    mem[1] = 0x00;
    mem[2] = 0x00;
-   mem[3] = 0x18;
+   mem[3] = 0x86;
    
    mem[4] = 0x70;
    mem[5] = 0x80;
    mem[6] = 0x00;
-   mem[7] = 0x1c;
+   mem[7] = 0x8a;
    
-   mem[8] = 0x39;
+   mem[8] = 0x71;
    mem[9] = 0x00;
-   mem[10] = 0x80;
-   mem[11] = 0x00;
+   mem[10] = 0x00;
+   mem[11] = 0x8e;
 
-   mem[12] = 0x90;
-   mem[13] = 0x0;
-   mem[14] = 0x0;
-   mem[15] = 0x20;
+   mem[12] = 0x71;
+   mem[13] = 0x80;
+   mem[14] = 0x00;
+   mem[15] = 0x92;
 
-   mem[16] = 0x78;
-   mem[17] = 0x0;
-   mem[18] = 0x0;
-   mem[19] = 0x20;
-
-   mem[20] = 0x0;
-   mem[21] = 0x0;
-   mem[22] = 0x0;
-   mem[23] = 0x0;
+   mem[16] = 0x72;
+   mem[17] = 0x00;
+   mem[18] = 0x00;
+   mem[19] = 0x96;
    
-   mem[24] = 0x0;
-   mem[25] = 0x0;
-   mem[26] = 0x0;
-   mem[27] = 0x0F;
+   /*corrigir*/
+   mem[20] = 0x42;
+   mem[21] = 0x9A; 
+   mem[22] = 0x00;
+   mem[23] = 0x00;
+   
+   mem[24] = 0x53;
+   mem[25] = 0x12;
+   mem[26] = 0x80;
+   mem[27] = 0x00;
 
    
-   mem[28] = 0x0;
-   mem[29] = 0x0;
-   mem[30] = 0x0;
-   mem[31] = 0x08;
+   mem[28] = 0x4B;
+   mem[29] = 0xB0;
+   mem[30] = 0x80;
+   mem[31] = 0x00;
+ 
+   mem[32] = 0x3c;
+   mem[33] = 0x03;
+   mem[34] = 0x08;
+   mem[35] = 0x00;
  
 
+   mem[36] = 0x7c;
+   mem[37] = 0x03;
+   mem[38] = 0x80;
+   mem[39] = 0x82;
+   
+   mem[40] = 0x0;
+   mem[41] = 0x0;
+   mem[42] = 0x0;
+   mem[43] = 0x0;  
+   
 
-    
-
-   while(x){
+   /*dados*/
+   mem[134] = 0x0; 
+   mem[135] = 0x0;
+   mem[136] = 0x0;
+   mem[137] = 0x20;
+   
+   mem[138] = 0x0; 
+   mem[139] = 0x0;
+   mem[140] = 0x0;
+   mem[141] = 0x3;
+   
+   mem[142] = 0x0; 
+   mem[143] = 0x0;
+   mem[144] = 0x0;
+   mem[145] = 0x4;
+   
+   mem[146] = 0x0; 
+   mem[147] = 0x0;
+   mem[148] = 0x0;
+   mem[149] = 0x5;
+   
+   mem[150] = 0x0;
+   mem[151] = 0x0;
+   mem[152] = 0x0;
+   mem[153] = 0x3;
+  while(x){
    busca();
    decodifica();
    executa();
@@ -144,7 +192,7 @@ void busca(void){
   mbr = (mbr<<8) + mem[mar++];
   mbr = (mbr<<8) + mem[mar++];
   mbr = (mbr<<8) + mem[mar++];
-   
+  printf("mbr: %x\n", mbr); 
 }
 
 
@@ -176,10 +224,11 @@ void decodifica(void){
 
  
   if(ir >= 7 && ir<=13){
+    
      ro0 = (mbr>>23) & 0xF;
      ro1 = (mbr>>19) & 0xF;
      ro2 = (mbr>>15) & 0xF;
-  
+     printf("%x %x %x", ro0, ro1, ro2);  
         
 }
 
@@ -188,7 +237,7 @@ void decodifica(void){
   if(ir==14 || ir ==15){
     mar = mbr & 0xFF;    
     ro0 = (mbr >> 23) & 0xF;
-   
+    
         
   }
   
@@ -255,18 +304,28 @@ void executa(void){
  
   if(ir == 7){
     reg[ro0] = reg[ro1] + reg[ro2];
+    
+    printf("\nSOMA - mem[ro1]:%i+mem[ro2]:%i", reg[ro1], reg[ro2]);   
   }
 
    if (ir == 8){
-    reg[ro2] = reg[ro1] - reg[ro0];
+    reg[ro0] = reg[ro1] - reg[ro2];
+
+    printf("\nSUB - mem[ro1]:%x - mem[ro2]:%x", reg[ro1], reg[ro2]);   
+    printf("\n%i", reg[ro0]);
   }
 
    if(ir == 9){
-    reg[ro2] = reg[ro1] * reg[ro0];
+    reg[ro0] = reg[ro1] * reg[ro2];
+      
+    
+    printf("\nMULT - mem[ro1]:%i * mem[ro2]:%i", reg[ro1], reg[ro2]);   
   }
 
    if(ir == 10){
-    reg[ro2] = reg[ro1]/reg[ro0];
+    reg[ro0] = reg[ro1]/reg[ro2];
+    
+    printf("\nDIV - mem[ro1]:%i/mem[ro2]:%i", reg[ro1], reg[ro2]);   
   }
   
    if(ir == 11){
@@ -281,8 +340,8 @@ void executa(void){
 
   //LOAD
   if(ir == 14){
-    mbr = mem[mar++];
-    mbr = (mbr<<8) + mem[mar++];
+    mbr = mem[mar++]; 
+    mbr = (mbr<<8) + mem[mar++]; 
     mbr = (mbr<<8) + mem[mar++];
     mbr = (mbr<<8) + mem[mar++];
     reg[ro0] = mbr;
@@ -290,7 +349,8 @@ void executa(void){
   
   if(ir == 15){
      mbr = reg[ro0];
-     /*
+     printf("resultado: %i", mbr); 
+    /*
       *
       *mbr[01234567.....31]
       * 
@@ -322,9 +382,7 @@ void executa(void){
   }
 
    if(ir == 18){
-     printf("IMM ANTES: reg[ro0]:%i", reg[ro0]);
      reg[ro0] = reg[ro0] + imm; 
-     printf("\nEntrei IMM:   reg[ro0]%i  ro0:%i  imm:%i", reg[ro0], ro0, imm); 
   }
    if(ir == 19){
      reg[ro0] = reg[ro0] - imm; 
