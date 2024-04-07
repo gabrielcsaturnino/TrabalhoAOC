@@ -1,5 +1,37 @@
 #include <stdio.h>
 #include <stdbool.h>
+#define hlt 0b00000;
+#define nop 0b00001;
+#define not 0b00010;
+#define movr 0b00011;
+#define cmp 0b00100;
+#define ldbo 0b00101;
+#define stbo 0b00110;
+#define add 0b00111;
+#define sup 0b01000;
+#define mul 0b01001;
+#define div 0b01010;
+#define and 0b01011;
+#define or 0b01100;
+#define xor 0b01101;
+#define ld 0b01110;
+#define st 0b01111;
+#define movil 0b10000;
+#define movih 0b10001;
+#define addi 0b10010;
+#define subi 0b10011;
+#define multi 0b10100;
+#define divi 0b10101;
+#define lsh 0b10110;
+#define rsh 0b10111;
+#define je 0b11000;
+#define jne 0b11001;  
+#define jl 0b11010;
+#define jle 0b11011;
+#define jg 0b11100;
+#define jge 0b11101;
+#define jmp 0b11110;
+
 unsigned int mbr,
              mar,
              pc,
@@ -23,35 +55,53 @@ void decodifica(void);
 void executa(void);
 
 
-
-
-
+    
 int main(void) {
      pc = 0;
    mem[0] = 0x70;
    mem[1] = 0x00;
    mem[2] = 0x00;
-   mem[3] = 0x12;
+   mem[3] = 0x18;
    
    mem[4] = 0x70;
    mem[5] = 0x80;
    mem[6] = 0x00;
-   mem[7] = 0x22;
+   mem[7] = 0x1c;
    
    mem[8] = 0x39;
    mem[9] = 0x00;
    mem[10] = 0x80;
    mem[11] = 0x00;
 
+   mem[12] = 0x90;
+   mem[13] = 0x0;
+   mem[14] = 0x0;
+   mem[15] = 0x20;
+
+   mem[16] = 0x78;
+   mem[17] = 0x0;
    mem[18] = 0x0;
-   mem[19] = 0x0;
+   mem[19] = 0x20;
+
    mem[20] = 0x0;
-   mem[21] = 0x6;
+   mem[21] = 0x0;
+   mem[22] = 0x0;
+   mem[23] = 0x0;
    
-   mem[34] = 0x0;
-   mem[35] = 0x0;
-   mem[36] = 0x0;
-   mem[37] = 0x10;
+   mem[24] = 0x0;
+   mem[25] = 0x0;
+   mem[26] = 0x0;
+   mem[27] = 0x0F;
+
+   
+   mem[28] = 0x0;
+   mem[29] = 0x0;
+   mem[30] = 0x0;
+   mem[31] = 0x08;
+ 
+
+
+    
 
    while(x){
    busca();
@@ -59,6 +109,32 @@ int main(void) {
    executa();
    getchar();
   }
+
+  
+    printf("Registros:\n");
+    for (int i = 0; i < 16; ++i) {
+        printf("reg[%d]: 0x%X\n", i, reg[i]);
+    }
+
+    printf("\nMemória:\n");
+    for (int i = 0; i < 154;++i) {
+        printf("mem[%d]: 0x%X ", i, mem[i]);
+  }
+    printf("\nOutras variáveis:\n");
+    printf("MBR: 0x%X\n", mbr);
+    printf("MAR: 0x%X\n", mar);
+    printf("IMM: 0x%X\n", imm);
+    printf("PC: 0x%X\n", pc);
+    printf("IR: 0x%X\n", ir);
+    printf("RO0: 0x%X\n", ro0);
+    printf("RO1: 0x%X\n", ro1);
+    printf("RO2: 0x%X\n", ro2);
+    printf("E: 0x%X\n", e);
+    printf("L: 0x%X\n", l);
+    printf("G: 0x%X\n", g);
+
+
+   
 }
 
 
@@ -75,8 +151,6 @@ void busca(void){
 void decodifica(void){
     ir = mbr>>27;
      
-    printf("\nmbr:%x", mbr);
-    printf("\nir:%b", ir); 
   
 
   if(ir == 0){
@@ -90,8 +164,8 @@ void decodifica(void){
 
 
   if(ir == 3 || ir == 4){
-    ro0 = (mbr>>19) & 0xF;
-    ro1 = (mbr>>15) & 0xF;
+    ro0 = (mbr>>23) & 0xF;
+    ro1 = (mbr>>19) & 0xF;
   }
   //ldbo stbo
   if(ir == 5 || ir == 6){
@@ -102,13 +176,11 @@ void decodifica(void){
 
  
   if(ir >= 7 && ir<=13){
-     ro0 = (mbr>>15) & 0xF;
+     ro0 = (mbr>>23) & 0xF;
      ro1 = (mbr>>19) & 0xF;
-     ro2 = (mbr>>23) & 0xF;
+     ro2 = (mbr>>15) & 0xF;
   
-     printf("\nro0:%x", ro0);
-     printf("\nro1:%x", ro1);
-     printf("\nro2:%x", ro2);    
+        
 }
 
  
@@ -125,6 +197,7 @@ void decodifica(void){
   if(ir >= 16 && ir<=23){
      ro0 = (mbr>>23) & 0xF; 
      imm =  mbr & 0x007FFFFF; 
+      
   }
   
 
@@ -181,8 +254,7 @@ void executa(void){
   }
  
   if(ir == 7){
-    reg[ro2] = reg[ro1] + reg[ro0];
-    printf("\nresultado:%i",reg[ro2]);     
+    reg[ro0] = reg[ro1] + reg[ro2];
   }
 
    if (ir == 8){
@@ -214,7 +286,6 @@ void executa(void){
     mbr = (mbr<<8) + mem[mar++];
     mbr = (mbr<<8) + mem[mar++];
     reg[ro0] = mbr;
-    
   }
   
   if(ir == 15){
@@ -228,9 +299,9 @@ void executa(void){
       *
       * */
      mem[mar] = mbr & 0xFF;
-     mem[mar++] = mbr & 0xFFFF;
-     mem[mar++] = mbr & 0xFFFFFF;
-     mem[mar++] = mbr & 0xFFFFFFFF;
+     mem[++mar] = mbr>>8 & 0xFF;
+     mem[++mar] = mbr>>16 & 0xFF;
+     mem[++mar] = mbr>>24 & 0xFF;
   }
 
 
@@ -240,18 +311,20 @@ void executa(void){
 
    if(ir == 16){
      
-    reg[ro0] &=0x0000FFFF;
+    reg[ro0] &=0xFFFF;
     reg[ro0] |=(imm&0xFFFF)<<16;
     
   } 
 
    if(ir == 17){
     reg[ro0] = 0;
-    reg[ro0] = imm & 0x0000FFFF; 
+    reg[ro0] = imm & 0xFFFF; 
   }
 
    if(ir == 18){
+     printf("IMM ANTES: reg[ro0]:%i", reg[ro0]);
      reg[ro0] = reg[ro0] + imm; 
+     printf("\nEntrei IMM:   reg[ro0]%i  ro0:%i  imm:%i", reg[ro0], ro0, imm); 
   }
    if(ir == 19){
      reg[ro0] = reg[ro0] - imm; 
@@ -269,8 +342,47 @@ void executa(void){
      reg[ro0] = reg[ro0] >> imm; 
   }
 
+  if(ir == 24 || ir == 25){
+    pc = mar;
+    
+  }
+  
+  if(ir == 26){
+    if(l == 1){
+      pc = mar;
+    }else{
+      return;
+    }
+  }
+  if(ir == 27){
+     if(e == 1 || l == 1){
+      pc = mar;
+    }else{
+      return;
+    }
+  }
+
+  if(ir == 28){
+    if(g ==  1){
+      pc = mar;
+    }else{
+      return;
+    }
+  }
  
- pc = pc + 4;
+  
+  if (ir == 29){
+      if(e == 1 || g == 1){
+          pc = mar;
+  }else{
+      return;
+  } 
+}
+  if(ir == 30){
+    pc = mar;
+  } 
+
+  pc = pc + 4;
 }
 
   void incremento(void){
