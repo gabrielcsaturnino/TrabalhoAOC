@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #define hlt 0b00000;
 #define nop 0b00001;
 #define not 0b00010;
@@ -47,7 +48,16 @@ unsigned char ro0,
               ir, 
             mem[154];
 
+
+
+
+
+
+
 bool x = true;
+
+
+
 
 
 void incremento(void);
@@ -59,6 +69,8 @@ void executa(void);
     
 int main(void) {
    
+
+  
    for(int i = 0;i<154; i++){
     mem[i] = 0x0;
   }
@@ -182,7 +194,23 @@ int main(void) {
     printf("G: 0x%X\n", g);
 
 
+ 
+   FILE *ptrArq;
+   ptrArq = fopen("arquivo1", "rt");  
+   char *result;
+   char Linha[100];
+   if(ptrArq == NULL){
+    printf("Erro ao abrir arquivo");
+  }
    
+  while(!feof(ptrArq)){
+  result = fgets(Linha,100,ptrArq);
+  if(result){
+    printf("%s", Linha);
+  }
+}
+
+  
 }
 
 
