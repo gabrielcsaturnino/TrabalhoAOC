@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #define hlt 0b00000;
 #define nop 0b00001;
 #define not 0b00010;
@@ -58,7 +59,7 @@ unsigned char ro0,
 bool x = true;
 
 
-
+int extrair_numero_registrador();
 void preencher(FILE *file);
 void incremento(void);
 void busca(void);
@@ -212,33 +213,52 @@ void preencher(FILE *file){
 
     char line[50];
     unsigned int index = 0;
-  
+    int teste;
     while (fgets(line, sizeof(line), file)) {
-        unsigned int opcode = 0, reg1 = 0, reg2 = 0, immediate = 0,address =0,valor =0;
-        char tipo, registrador[3], instrucao[10];
-
-        sscanf(line, "%*d;%c;%*[^,], %x", &tipo, &immediate);
-        printf("\n%s", line);
-        if (tipo == 'i') {
-            if (strstr(line, "ld") != NULL) {
+        unsigned int opcode = 0, immediate = 0,address =0,valor =0;
+        char tipo, registrador, instrucao[10];
+        unsigned int palavra = 0;
+        sscanf(line, "%*d;%c;%*[^,] , %*x", &tipo);
+    if (tipo == 'i') {
+            if (strstr(line, "ld") != NULL | strstr(line, "st") !=NULL) {
+                sscanf(line, "%x;%c;%[^,], %x", &address,&tipo,&instrucao ,&valor);
+                teste = extrair_numero_registrador(instrucao);
+                printf("\n%i", teste);
                 opcode = ld;
-                sscanf(line,"%u;%c;%[^,],r%s, %x", index, &tipo, instrucao, registrador, &valor);
-                printf("Endereço: %i\n", index);
-                printf("Tipo: %c\n", tipo);
-                printf("Registrador: %s\n", registrador);
-                printf("Valor: %x\n", valor);
-                printf("Instrução: %s\n", instrucao);
-                index++;
-                index++;
-                index++;
-                index++;} 
-      address += 4;
+                registrador = teste;               
+                palavra = opcode;
+                palavra = (palavra << 23) | ((registrador & 0xF) << 19); // Deslocamento de 23 bits para o campo do opcode
+                palavra = palavra | (valor & 0x7FFFFF);          
+                printf("\npalavra:%x", palavra);
+                
+                
+      } 
     }
 
     
 }
 fclose(file);
 }
+
+
+int extrair_numero_registrador(const char *instrucao) {
+    const char *ptr = instrucao;
+    
+    // Encontrar o caractere 'r'
+    while (*ptr && *ptr != 'r') {
+        ptr++;
+    }
+
+    // Se 'r' não for encontrado ou se não houver um dígito depois
+    if (*ptr == '\0' || !isdigit(*(ptr + 1))) {
+        return -1; // Retorna -1 se não encontrar 'r' ou não houver um número de registrador válido
+    }
+
+    // Extrair o número do registrador
+    return atoi(ptr + 1);
+}
+
+
 void busca(void){
   mar = pc;
   mbr = mem[mar++];
