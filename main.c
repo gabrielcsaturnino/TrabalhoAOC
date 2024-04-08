@@ -129,8 +129,8 @@ int main(void) {
  
 
    mem[36] = 0x7c;
-   mem[37] = 0x03;
-   mem[38] = 0x80;
+   mem[37] = 0x00;
+   mem[38] = 0x00;
    mem[39] = 0x82;
    
    mem[40] = 0x0;
@@ -213,7 +213,7 @@ void preencher(FILE *file){
 
     char line[50];
     unsigned int index = 0;
-    int teste;
+    int reg;
     while (fgets(line, sizeof(line), file)) {
         unsigned int opcode = 0, immediate = 0,address =0,valor =0;
         char tipo, registrador, instrucao[10];
@@ -222,10 +222,14 @@ void preencher(FILE *file){
     if (tipo == 'i') {
             if (strstr(line, "ld") != NULL | strstr(line, "st") !=NULL) {
                 sscanf(line, "%x;%c;%[^,], %x", &address,&tipo,&instrucao ,&valor);
-                teste = extrair_numero_registrador(instrucao);
-                printf("\n%i", teste);
+                if(strstr(line, "ld")){
                 opcode = ld;
-                registrador = teste;               
+          }     if(strstr(line, "st")){
+                opcode = st;
+        }
+                reg = extrair_numero_registrador(instrucao);
+                printf("\n%i", reg);
+                registrador = reg;               
                 palavra = opcode;
                 palavra = (palavra << 23) | ((registrador & 0xF) << 19); // Deslocamento de 23 bits para o campo do opcode
                 palavra = palavra | (valor & 0x7FFFFF);          
