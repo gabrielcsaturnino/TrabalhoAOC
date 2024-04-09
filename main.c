@@ -214,12 +214,12 @@ void preencher(FILE *file){
     char line[50];
     unsigned int index = 0;
     while (fgets(line, sizeof(line), file)) {
-        index = index+4;
         unsigned int opcode = 0,address =0,valor =0;
-        char tipo,  instrucao[10], instrucao1[10], instrucao2[10], reg0=0,reg1=0,reg2=0;
+        char tipo = 0,  instrucao[10], instrucao1[10], instrucao2[10], reg0=0,reg1=0,reg2=0;
         unsigned int palavra = 0;
-       sscanf(line, "%*d;%c;%*[^,] , %*x", &tipo);
-       printf("\n%s", line);    
+       sscanf(line, "%*[^di]%c", &tipo);
+       printf("\ntipo:%c", tipo);
+    printf("\n%s", line);    
     if (tipo == 'i') {
       if(strstr(line, "hlt") != NULL | strstr(line, "nop") !=NULL){
         sscanf(line, "%x;%*c;%*[^,], %*x", &address);
@@ -232,6 +232,19 @@ void preencher(FILE *file){
     
 
         printf("\npalavra:%s", palavra);
+      mem[address++] = (palavra >> 24) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 16) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 8) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = palavra & 0xFF;
+
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+
       }
          
       if(strstr(line, "not") !=NULL){
@@ -240,6 +253,19 @@ void preencher(FILE *file){
         reg0 = extrair_numero_registrador(instrucao);
         palavra = opcode;
         palavra = (palavra<<27) | ((reg0 & 0xF)<<23);
+      mem[address++] = (palavra >> 24) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 16) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 8) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = palavra & 0xFF;
+
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+
       }
 
       if(strstr(line, "movr") !=NULL | strstr(line, "cmp") !=NULL){
@@ -260,6 +286,19 @@ void preencher(FILE *file){
           palavra = opcode << 27;
           palavra |= ((reg0 & 0xF) << 23);
           palavra |= ((reg1 & 0xF) << 19);       
+      mem[address++] = (palavra >> 24) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 16) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 8) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = palavra & 0xFF;
+
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+
       }
 
                  
@@ -278,8 +317,21 @@ void preencher(FILE *file){
           palavra = opcode << 27;
           palavra  |= ((reg0 & 0xF) << 23);
           palavra  |= ((reg1 & 0xF) << 19);
-          palavra  |= (valor & 0x7FFFFF);
-      }else{
+         palavra  |= (valor & 0x7FFFFF);
+      mem[address++] = (palavra >> 24) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 16) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 8) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = palavra & 0xFF;
+
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+
+        }else{
         sscanf(line, "%x;%*c;%[^,], %x", &address,&instrucao ,&valor);
                 if(strstr(line, "ld")){
                 opcode = ld;
@@ -291,7 +343,20 @@ void preencher(FILE *file){
                 palavra |= ((reg0 & 0xF) << 23); 
                 palavra = palavra | (valor & 0x7FFFFF);          
                 printf("palavra:%x\n", palavra);
-      } 
+      mem[address++] = (palavra >> 24) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 16) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 8) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = palavra & 0xFF;
+
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+
+        } 
     }
       if(strstr(line, "add") != NULL 
     |strstr(line, "sub") != NULL 
@@ -326,7 +391,21 @@ void preencher(FILE *file){
         palavra = opcode << 27;
         palavra |= ((reg0 & 0xF)<<23);
         palavra |= (valor & 0x7FFFF);
-        printf("palavra:%x", palavra);
+        
+            mem[address++] = (palavra >> 24) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 16) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 8) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = palavra & 0xFF;
+
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+
+            printf("palavra:%x", palavra);
           }else
         {
         sscanf(line, "%x;%*c;%[^,],%[^,],%[^,] %*x", &address,&instrucao ,&instrucao1, &instrucao2);
@@ -355,8 +434,23 @@ void preencher(FILE *file){
         palavra |= ((reg0 & 0xF) << 23);    
         palavra |= ((reg1 & 0xF) << 19);    
         palavra |= ((reg2 & 0xF) << 15);
-        printf("\npalavra:%x", palavra);
-      }}     
+         printf("\npalavra:%x", palavra);
+         
+        mem[address++] = (palavra >> 24) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 16) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 8) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = palavra & 0xFF;
+
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+           
+
+        }}     
       if(strstr(line, "movil") !=NULL | strstr(line, "movih") !=NULL){
         sscanf(line, "%x;%*c;%[^,], %x", &address, &instrucao, &valor);
         reg0 = extrair_numero_registrador(instrucao); 
@@ -369,6 +463,19 @@ void preencher(FILE *file){
         palavra = opcode << 27;
         palavra |= ((reg0 & 0xF)<<23);
         palavra |= (valor & 0x7FFFFF);
+       
+        mem[address++] = (palavra >> 24) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 16) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 8) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = palavra & 0xFF;
+
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
 
       }
     
@@ -430,9 +537,41 @@ void preencher(FILE *file){
         palavra |= opcode << 27;
         palavra |=0 << 23;
         palavra |= (valor & 0x7FFFFF);
-      } 
-    }
-    
+        mem[address++] = (palavra >> 24) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 16) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 8) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = palavra & 0xFF;
+
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+
+             } 
+   
+
+     
+  }
+   if(tipo == 'd'){
+        sscanf(line, "%x;%*[^;];%x", &address, &valor);
+        palavra = valor;
+         mem[address++] = (palavra >> 24) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 16) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 8) & 0xFF;
+         
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = palavra & 0xFF;
+
+        printf("MEM[%i]=%x\n",address, mem[address-1]);
+       
+    }  
 }
 fclose(file);
 }
