@@ -70,7 +70,7 @@ void executa(void);
     
 int main(void) {
    
-  FILE *file = fopen("arquivo2", "rt"); 
+  FILE *file = fopen("arquivo3", "rt"); 
   preencher(file);   
    for(int i = 0;i<154; i++){
     mem[i] = 0x0;
@@ -213,18 +213,14 @@ void preencher(FILE *file){
 
     char line[50];
     unsigned int index = 0;
-    char reg0;
-    char reg1;
-    char reg2;
     while (fgets(line, sizeof(line), file)) {
         index = index+4;
         unsigned int opcode = 0,address =0,valor =0;
-        char tipo,  instrucao[10], instrucao1[10], instrucao2[10];
+        char tipo,  instrucao[10], instrucao1[10], instrucao2[10], reg0=0,reg1=0,reg2=0;
         unsigned int palavra = 0;
-        sscanf(line, "%*d;%c;%*[^,] , %*x", &tipo);
+       sscanf(line, "%*d;%c;%*[^,] , %*x", &tipo);
+       printf("\n%s", line);    
     if (tipo == 'i') {
-           
-        
       if(strstr(line, "hlt") != NULL | strstr(line, "nop") !=NULL){
         sscanf(line, "%x;%*c;%*[^,], %*x", &address);
         if(strstr(line, "hlt")){
@@ -294,7 +290,7 @@ void preencher(FILE *file){
                 palavra = opcode << 27;
                 palavra |= ((reg0 & 0xF) << 23); 
                 palavra = palavra | (valor & 0x7FFFFF);          
-                printf("\npalavra:%x", palavra);
+                printf("palavra:%x\n", palavra);
       } 
     }
       if(strstr(line, "add") != NULL 
@@ -304,7 +300,7 @@ void preencher(FILE *file){
     |strstr(line, "and") != NULL 
     |strstr(line, "or") != NULL 
     |strstr(line, "xor") != NULL ){
-
+        
         if(strstr(line, "addi") !=NULL
         |strstr(line, "subi") !=NULL
         |strstr(line, "multi") !=NULL
@@ -314,7 +310,7 @@ void preencher(FILE *file){
         sscanf(line, "%x;%*c;%[^,], %x", &address,&instrucao ,&valor);
         reg0 = extrair_numero_registrador(instrucao); 
         if(strstr(line, "addi")){
-              opcode = addi;
+             opcode = addi;
         }if(strstr(line, "subi")){
              opcode = subi;
         } if(strstr(line, "multi")){
@@ -331,7 +327,8 @@ void preencher(FILE *file){
         palavra |= ((reg0 & 0xF)<<23);
         palavra |= (valor & 0x7FFFF);
         printf("palavra:%x", palavra);
-          }else{
+          }else
+        {
         sscanf(line, "%x;%*c;%[^,],%[^,],%[^,] %*x", &address,&instrucao ,&instrucao1, &instrucao2);
         reg0 = extrair_numero_registrador(instrucao); 
         reg1 = extrair_numero_registrador(instrucao1);
@@ -351,7 +348,7 @@ void preencher(FILE *file){
         if(strstr(line, "or")){
           opcode = or;
         }
-        if(strstr(line, "xor;")){
+        if(strstr(line, "xor")){
           opcode = xor;
         }
         palavra = opcode << 27;
@@ -430,11 +427,9 @@ void preencher(FILE *file){
         
           printf("valor:%d\n", valor);
         }
-        printf("passou op:%x", opcode);       
         palavra |= opcode << 27;
         palavra |=0 << 23;
         palavra |= (valor & 0x7FFFFF);
-        printf("palavra:%s", palavra);
       } 
     }
     
