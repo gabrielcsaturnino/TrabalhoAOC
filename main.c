@@ -11,7 +11,7 @@
 #define ldbo 0b00101;
 #define stbo 0b00110;
 #define add 0b00111;
-#define sup 0b01000;
+#define sub 0b01000;
 #define mul 0b01001;
 #define div 0b01010;
 #define and 0b01011;
@@ -70,7 +70,7 @@ void executa(void);
     
 int main(void) {
    
-  FILE *file = fopen("arquivo1", "rt"); 
+  FILE *file = fopen("arquivo2", "rt"); 
   preencher(file);   
    for(int i = 0;i<154; i++){
     mem[i] = 0x0;
@@ -213,32 +213,230 @@ void preencher(FILE *file){
 
     char line[50];
     unsigned int index = 0;
-    int reg;
+    char reg0;
+    char reg1;
+    char reg2;
     while (fgets(line, sizeof(line), file)) {
-        unsigned int opcode = 0, immediate = 0,address =0,valor =0;
-        char tipo, registrador, instrucao[10];
+        index = index+4;
+        unsigned int opcode = 0,address =0,valor =0;
+        char tipo,  instrucao[10], instrucao1[10], instrucao2[10];
         unsigned int palavra = 0;
         sscanf(line, "%*d;%c;%*[^,] , %*x", &tipo);
     if (tipo == 'i') {
-            if (strstr(line, "ld") != NULL | strstr(line, "st") !=NULL) {
-                sscanf(line, "%x;%c;%[^,], %x", &address,&tipo,&instrucao ,&valor);
+           
+        
+      if(strstr(line, "hlt") != NULL | strstr(line, "nop") !=NULL){
+        sscanf(line, "%x;%*c;%*[^,], %*x", &address);
+        if(strstr(line, "hlt")){
+          opcode = hlt;
+        }if(strstr(line, "nop")){
+                opcode = nop;
+        }
+                palavra = opcode << 27;
+    
+
+        printf("\npalavra:%s", palavra);
+      }
+         
+      if(strstr(line, "not") !=NULL){
+        opcode = not;
+        sscanf(line, "%x;%*c;%[^,], %*x", &address,&instrucao);
+        reg0 = extrair_numero_registrador(instrucao);
+        palavra = opcode;
+        palavra = (palavra<<27) | ((reg0 & 0xF)<<23);
+      }
+
+      if(strstr(line, "movr") !=NULL | strstr(line, "cmp") !=NULL){
+        sscanf(line, "%x;%*c;%[^,], %[^,], %*[^,]", &address,&instrucao,&instrucao1);
+        printf("\nlinha:%s", line);
+        
+        reg0 = extrair_numero_registrador(instrucao);
+        reg1 = extrair_numero_registrador(instrucao1);
+        printf("\nrg:%s", reg);
+        printf("\nrg1:%s", reg1);  
+  
+        if(strstr(line, "movr")){
+          opcode = movr;
+        }
+        if(strstr(line,"cmp")){
+          opcode = cmp;
+        }
+          palavra = opcode << 27;
+          palavra |= ((reg0 & 0xF) << 23);
+          palavra |= ((reg1 & 0xF) << 19);       
+      }
+
+                 
+
+      if (strstr(line, "ld") != NULL | strstr(line, "st") !=NULL) {
+        if (strstr(line, "ldbo") != NULL | strstr(line, "stbo") !=NULL) {
+        sscanf(line, "%x;%*c;%[^,],%[^,], %x", &address,&instrucao,&instrucao1 ,&valor);
+        if(strstr(line, "ldbo")){
+          opcode = ldbo;
+          }     
+        if(strstr(line, "stbo")){
+          opcode = stbo;
+        }
+          reg0 = extrair_numero_registrador(instrucao); 
+          reg1 = extrair_numero_registrador(instrucao1); 
+          palavra = opcode << 27;
+          palavra  |= ((reg0 & 0xF) << 23);
+          palavra  |= ((reg1 & 0xF) << 19);
+          palavra  |= (valor & 0x7FFFFF);
+      }else{
+        sscanf(line, "%x;%*c;%[^,], %x", &address,&instrucao ,&valor);
                 if(strstr(line, "ld")){
                 opcode = ld;
           }     if(strstr(line, "st")){
                 opcode = st;
         }
-                reg = extrair_numero_registrador(instrucao);
-                printf("\n%i", reg);
-                registrador = reg;               
-                palavra = opcode;
-                palavra = (palavra << 23) | ((registrador & 0xF) << 19); // Deslocamento de 23 bits para o campo do opcode
+                reg0 = extrair_numero_registrador(instrucao);
+                palavra = opcode << 27;
+                palavra |= ((reg0 & 0xF) << 23); 
                 palavra = palavra | (valor & 0x7FFFFF);          
                 printf("\npalavra:%x", palavra);
-                
-                
       } 
     }
+      if(strstr(line, "add") != NULL 
+    |strstr(line, "sub") != NULL 
+    |strstr(line, "mul") != NULL 
+    |strstr(line, "div") != NULL 
+    |strstr(line, "and") != NULL 
+    |strstr(line, "or") != NULL 
+    |strstr(line, "xor") != NULL ){
 
+        if(strstr(line, "addi") !=NULL
+        |strstr(line, "subi") !=NULL
+        |strstr(line, "multi") !=NULL
+        |strstr(line, "divi") !=NULL 
+        |strstr(line, "lsh") !=NULL 
+        |strstr(line, "rsh") !=NULL){
+        sscanf(line, "%x;%*c;%[^,], %x", &address,&instrucao ,&valor);
+        reg0 = extrair_numero_registrador(instrucao); 
+        if(strstr(line, "addi")){
+              opcode = addi;
+        }if(strstr(line, "subi")){
+             opcode = subi;
+        } if(strstr(line, "multi")){
+             opcode = multi;
+        } if(strstr(line, "divi")){
+             opcode = divi;
+        } if(strstr(line, "lsh")){
+             opcode = lsh;
+        } if(strstr(line, "rsh")){
+             opcode = rsh;
+        
+        }
+        palavra = opcode << 27;
+        palavra |= ((reg0 & 0xF)<<23);
+        palavra |= (valor & 0x7FFFF);
+        printf("palavra:%x", palavra);
+          }else{
+        sscanf(line, "%x;%*c;%[^,],%[^,],%[^,] %*x", &address,&instrucao ,&instrucao1, &instrucao2);
+        reg0 = extrair_numero_registrador(instrucao); 
+        reg1 = extrair_numero_registrador(instrucao1);
+        reg2 = extrair_numero_registrador(instrucao2);
+        if(strstr(line, "add")){
+            opcode = add;
+        }
+        if(strstr(line, "mul")){
+          opcode = mul;
+        }
+        if(strstr(line, "div")){
+          opcode = div;
+        }
+        if(strstr(line, "sub")){
+          opcode = sub;
+        }
+        if(strstr(line, "or")){
+          opcode = or;
+        }
+        if(strstr(line, "xor;")){
+          opcode = xor;
+        }
+        palavra = opcode << 27;
+        palavra |= ((reg0 & 0xF) << 23);    
+        palavra |= ((reg1 & 0xF) << 19);    
+        palavra |= ((reg2 & 0xF) << 15);
+        printf("\npalavra:%x", palavra);
+      }}     
+      if(strstr(line, "movil") !=NULL | strstr(line, "movih") !=NULL){
+        sscanf(line, "%x;%*c;%[^,], %x", &address, &instrucao, &valor);
+        reg0 = extrair_numero_registrador(instrucao); 
+        if(strstr(line, "movil")){
+          opcode = movil;
+        }
+        if(strstr(line, "movih")){
+          opcode = movih;
+        }
+        palavra = opcode << 27;
+        palavra |= ((reg0 & 0xF)<<23);
+        palavra |= (valor & 0x7FFFFF);
+
+      }
+    
+
+      if(strstr(line, "je")!=NULL 
+        |strstr(line, "jne")!=NULL 
+        |strstr(line, "jl")!=NULL 
+        |strstr(line, "jle")!=NULL
+        |strstr(line, "jg")!=NULL
+        |strstr(line, "jge")!=NULL 
+        |strstr(line, "jmp")!=NULL){
+        sscanf(line, "%x;", &address);
+        
+             printf("entrei jle");
+
+        if(strstr(line, "je")){
+          opcode = je;
+          char *ptr = strstr(line, "je");
+          sscanf(ptr, "je %d", &valor);
+        }
+
+        if(strstr(line, "jne")){
+          opcode = jne;
+          char *ptr = strstr(line, "jne");
+          sscanf(ptr, "jne %d", &valor);
+        }
+
+        if(strstr(line, "jl")){
+          if(strstr(line, "jle")){
+             opcode = jle;
+             char *ptr = strstr(line, "jle");
+             sscanf(ptr, "jle %d", &valor);
+          }else{
+             opcode = jl;
+             char *ptr = strstr(line, "jl");
+             sscanf(ptr, "jl %d", &valor);
+          }
+        }
+
+        if(strstr(line, "jg")){
+          if(strstr(line, "jge")){
+            opcode = jge;
+            char *ptr = strstr(line, "jge");
+            sscanf(ptr, "jge %d", &valor);
+          }else{
+            opcode = jg;
+            char *ptr = strstr(line, "je");
+            sscanf(ptr, "je %d", &valor);
+          }
+        }
+
+        if(strstr(line, "jmp")){
+          opcode = jmp;
+          char *ptr = strstr(line, "jmp");
+          sscanf(ptr, "jmp %d", &valor);
+        
+          printf("valor:%d\n", valor);
+        }
+        printf("passou op:%x", opcode);       
+        palavra |= opcode << 27;
+        palavra |=0 << 23;
+        palavra |= (valor & 0x7FFFFF);
+        printf("palavra:%s", palavra);
+      } 
+    }
     
 }
 fclose(file);
@@ -248,17 +446,14 @@ fclose(file);
 int extrair_numero_registrador(const char *instrucao) {
     const char *ptr = instrucao;
     
-    // Encontrar o caractere 'r'
     while (*ptr && *ptr != 'r') {
         ptr++;
     }
 
-    // Se 'r' não for encontrado ou se não houver um dígito depois
     if (*ptr == '\0' || !isdigit(*(ptr + 1))) {
         return -1; // Retorna -1 se não encontrar 'r' ou não houver um número de registrador válido
     }
 
-    // Extrair o número do registrador
     return atoi(ptr + 1);
 }
 
@@ -330,7 +525,7 @@ void decodifica(void){
   //jumps *DUVIDA* jumps devem receber apenas -mar: endereco de memoria- ou devem receber tambem, assim como o load, o conteudo do endereco de memoria X.
   if(ir >=24 && ir<=30){
     
-    mar = mbr & 0xFF;
+    mar = mbr & 0x007FFFFF;
 
   }
 
