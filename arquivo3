@@ -12,6 +12,7 @@ c;i;ld r3, 86
 2c;i;add r9, r9, r8
 30;i;add r0, r0, r9
 34;i;addi r1, 1
+38;i;cmp r1, r2
 3c;i;jle 30
 40;i;st r0, 7a
 44;i;st r1, 7e
