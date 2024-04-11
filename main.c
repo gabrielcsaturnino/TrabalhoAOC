@@ -1,3 +1,10 @@
+/*
+ *
+ *Inserir o arquivo de texto a ser executado: Linha 80.
+ *
+ * */
+
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -676,7 +683,7 @@ void imprimir(){
     printf("E: 0x%X\n", e);
     printf("L: 0x%X\n", l);
     printf("G: 0x%X\n", g);
-    printf("\n\n Preciose enter para continuar o ciclo ou CTRL + C para encerrar o programa.");
+    printf("\n\n Precione ENTER para continuar o ciclo ou CTRL + C para encerrar o programa.");
 
 
 
