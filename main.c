@@ -464,7 +464,6 @@ void decodifica(void){
 
 void executa(void){
    if(ir == 1){
-   incremento();
   }
    
    if(ir == 2){
@@ -511,7 +510,8 @@ void executa(void){
     mbr = (mbr<<8) + mem[reg[ro1]+mar++];
     mbr = (mbr<<8) + mem[reg[ro1]+mar++];
     reg[ro0] = mbr;
-  }
+ }
+
 
   if(ir == 6){
      mbr = reg[ro0];
@@ -519,45 +519,36 @@ void executa(void){
      mem[++mar+reg[ro1]] = mbr>>8 & 0xFF;
      mem[++mar+reg[ro1]] = mbr>>16 & 0xFF;
      mem[++mar+reg[ro1]] = mbr>>24 & 0xFF;
-  
   }
  
   if(ir == 7){
     reg[ro0] = reg[ro1] + reg[ro2];
-    
   
   }
 
    if (ir == 8){
     reg[ro0] = reg[ro1] - reg[ro2];
-
   
   }
 
    if(ir == 9){
     reg[ro0] = reg[ro1] * reg[ro2];
-  
-      
     
   }
 
    if(ir == 10){
     reg[ro0] = reg[ro1]/reg[ro2];
-    
   
   }
   
    if(ir == 11){
     reg[ro2] = reg[ro1]&reg[ro0];
-  
   }
    if (ir == 12){
     reg[ro2] = reg[ro1]|reg[ro0];
-  
       } 
    if (ir == 13){
     reg[ro2] = reg[ro1]^reg[ro0];
-  
   } 
 
   if(ir == 14){
@@ -566,82 +557,64 @@ void executa(void){
     mbr = (mbr<<8) + mem[mar++];
     mbr = (mbr<<8) + mem[mar++];
     reg[ro0] = mbr;
-  
   }
   
   if(ir == 15){
      mbr = reg[ro0];
-     printf("resultado: %i", mbr);   
      mem[mar] = mbr & 0xFF;
      mem[++mar] = mbr>>8 & 0xFF;
      mem[++mar] = mbr>>16 & 0xFF;
      mem[++mar] = mbr>>24 & 0xFF;
-  
   }
 
  if(ir == 16){
     reg[ro0] = 0;
     reg[ro0] = imm & 0xFFFF; 
-  
   }
 
    if(ir == 17){
      
     reg[ro0] &=0xFFFF;
     reg[ro0] |=(imm&0xFFFF)<<16;
-    
   
   } 
-
-  
-
    if(ir == 18){
      reg[ro0] = reg[ro0] + imm; 
- 
-  
   }
    if(ir == 19){
      reg[ro0] = reg[ro0] - imm; 
-  
   } 
     if(ir == 20){
      reg[ro0] = reg[ro0] * imm; 
-  
   }
     if(ir == 21){
     reg[ro0] = reg[ro0] / imm;
-  
   }
     if(ir == 22){
      reg[ro0] = reg[ro0] << imm; 
-  
   }
     if(ir == 23){
      reg[ro0] = reg[ro0] >> imm; 
-  
   }
 
   if(ir == 24 || ir == 25){
     pc = mar;
-    
   }
   
   if(ir == 26){
     if(l == 1){
       pc = mar;
     }else{
-      pc = pc + 4;
-      return;
+     incremento();
+     return;
   
     }
   }
   if(ir == 27){
      if(e == 1 || l == 1){
       pc = mar;
-      printf("\nJLE");
     }else{
-      pc = pc + 4;
-  
+     incremento(); 
       return;
     }
   }
@@ -650,7 +623,7 @@ void executa(void){
     if(g ==  1){
       pc = mar;
     }else{
-      
+      incremento(); 
       return;
   
     }
@@ -661,7 +634,8 @@ void executa(void){
       if(e == 1 || g == 1){
           pc = mar;
   }else{
-      return;
+       incremento();
+       return;
   
   } 
 }
@@ -671,10 +645,8 @@ void executa(void){
   
 
   if(!(ir>=24 && ir<=30)){
-  
-	  pc = pc + 4;
+	 incremento(); 
   }
-
 }
 
 void incremento(void){
