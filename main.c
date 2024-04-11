@@ -65,7 +65,7 @@ void incremento(void);
 void busca(void);
 void decodifica(void);
 void executa(void);
-
+void imprimir(void);
 
     
 int main(void) {
@@ -81,35 +81,12 @@ int main(void) {
    busca();
    decodifica();
    executa();
-   getchar();
+   imprimir();
+    getchar();
   }
 
   
-    printf("Registros:\n");
-    for (int i = 0; i < 16; ++i) {
-        printf("reg[%d]: 0x%X\n", i, reg[i]);
-    }
-
-    printf("\nMemória:\n");
-    for (int i = 0; i < 154;++i) {
-        printf("mem[%d]: 0x%X ", i, mem[i]);
-  }
-    printf("\nOutras variáveis:\n");
-    printf("MBR: 0x%X\n", mbr);
-    printf("MAR: 0x%X\n", mar);
-    printf("IMM: 0x%X\n", imm);
-    printf("PC: 0x%X\n", pc);
-    printf("IR: 0x%X\n", ir);
-    printf("RO0: 0x%X\n", ro0);
-    printf("RO1: 0x%X\n", ro1);
-    printf("RO2: 0x%X\n", ro2);
-    printf("E: 0x%X\n", e);
-    printf("L: 0x%X\n", l);
-    printf("G: 0x%X\n", g);
-
-
-
-
+   
 }
 
 
@@ -130,8 +107,6 @@ void preencher(FILE *file){
         char tipo = 0,  instrucao[10], instrucao1[10], instrucao2[10], reg0=0,reg1=0,reg2=0;
         unsigned int palavra = 0;
        sscanf(line, "%*[^di]%c", &tipo);
-       printf("\ntipo:%c", tipo);
-    printf("\n%s", line);    
     if (tipo == 'i') {
       if(strstr(line, "hlt") != NULL | strstr(line, "nop") !=NULL){
         sscanf(line, "%x;%*c;%*[^,], %*x", &address);
@@ -143,19 +118,11 @@ void preencher(FILE *file){
                 palavra = opcode << 27;
     
 
-        printf("\npalavra:%s", palavra);
-      mem[address++] = (palavra >> 24) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 24) & 0xFF;
           mem[address++] = (palavra >> 16) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
           mem[address++] = (palavra >> 8) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
           mem[address++] = palavra & 0xFF;
 
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
 
       }
          
@@ -165,24 +132,17 @@ void preencher(FILE *file){
         reg0 = extrair_numero_registrador(instrucao);
         palavra = opcode;
         palavra = (palavra<<27) | ((reg0 & 0xF)<<23);
-      mem[address++] = (palavra >> 24) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
+      
+	  mem[address++] = (palavra >> 24) & 0xFF;
           mem[address++] = (palavra >> 16) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
           mem[address++] = (palavra >> 8) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
           mem[address++] = palavra & 0xFF;
 
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
 
       }
 
       if(strstr(line, "movr") !=NULL | strstr(line, "cmp") !=NULL){
         sscanf(line, "%x;%*c;%[^,], %[^,], %*[^,]", &address,&instrucao,&instrucao1);
-        printf("\nlinha:%s", line);
         
         reg0 = extrair_numero_registrador(instrucao);
         reg1 = extrair_numero_registrador(instrucao1);
@@ -197,18 +157,12 @@ void preencher(FILE *file){
           palavra |= ((reg0 & 0xF) << 23);
           palavra |= ((reg1 & 0xF) << 19);       
          
-        mem[address++] = (palavra >> 24) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          
+	  mem[address++] = (palavra >> 24) & 0xFF;
           mem[address++] = (palavra >> 16) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
           mem[address++] = (palavra >> 8) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
           mem[address++] = palavra & 0xFF;
 
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
 
       }
 
@@ -229,18 +183,13 @@ void preencher(FILE *file){
           palavra  |= ((reg0 & 0xF) << 23);
           palavra  |= ((reg1 & 0xF) << 19);
           palavra  |= (valor & 0x7FFFFF);
-      mem[address++] = (palavra >> 24) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
+      
+	  
+	  mem[address++] = (palavra >> 24) & 0xFF;
           mem[address++] = (palavra >> 16) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
           mem[address++] = (palavra >> 8) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
           mem[address++] = palavra & 0xFF;
 
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
 
         }else{
         sscanf(line, "%x;%*c;%[^,], %x", &address,&instrucao ,&valor);
@@ -253,20 +202,12 @@ void preencher(FILE *file){
                 palavra = opcode << 27;
                 palavra |= ((reg0 & 0xF) << 23); 
                 palavra |= (valor & 0x7FFFFF);          
-                printf("palavra:%x\n", palavra);
-      mem[address++] = (palavra >> 24) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
-          mem[address++] = (palavra >> 16) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
-          mem[address++] = (palavra >> 8) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
-          mem[address++] = palavra & 0xFF;
-
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
-
+      
+		
+		mem[address++] = (palavra >> 24) & 0xFF;
+                mem[address++] = (palavra >> 16) & 0xFF;
+                mem[address++] = (palavra >> 8) & 0xFF;
+                mem[address++] = palavra & 0xFF;
         } 
     }
       if(strstr(line, "add") != NULL 
@@ -303,20 +244,12 @@ void preencher(FILE *file){
         palavra |= ((reg0 & 0xF)<<23);
         palavra |= (valor & 0x7FFFF);
         
-            mem[address++] = (palavra >> 24) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 24) & 0xFF;
           mem[address++] = (palavra >> 16) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
           mem[address++] = (palavra >> 8) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
           mem[address++] = palavra & 0xFF;
 
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
 
-            printf("palavra:%x", palavra);
           }else
         {
         sscanf(line, "%x;%*c;%[^,],%[^,],%[^,] %*x", &address,&instrucao ,&instrucao1, &instrucao2);
@@ -345,20 +278,12 @@ void preencher(FILE *file){
         palavra |= ((reg0 & 0xF) << 23);    
         palavra |= ((reg1 & 0xF) << 19);    
         palavra |= ((reg2 & 0xF) << 15);
-         printf("\npalavra:%x", palavra);
          
-        mem[address++] = (palavra >> 24) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 24) & 0xFF;
           mem[address++] = (palavra >> 16) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
           mem[address++] = (palavra >> 8) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
           mem[address++] = palavra & 0xFF;
 
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
            
 
         }}     
@@ -375,19 +300,10 @@ void preencher(FILE *file){
         palavra |= ((reg0 & 0xF)<<23);
         palavra |= (valor & 0x7FFFFF);
        
-        mem[address++] = (palavra >> 24) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
+          mem[address++] = (palavra >> 24) & 0xFF;
           mem[address++] = (palavra >> 16) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
           mem[address++] = (palavra >> 8) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
           mem[address++] = palavra & 0xFF;
-
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
-
       }
     
 
@@ -399,8 +315,6 @@ void preencher(FILE *file){
         |strstr(line, "jge")!=NULL 
         |strstr(line, "jmp")!=NULL){
         sscanf(line, "%x;", &address);
-        
-             printf("entrei jle");
 
         if(strstr(line, "je")){
           opcode = je;
@@ -444,23 +358,15 @@ void preencher(FILE *file){
           char *ptr = strstr(line, "jmp");
           sscanf(ptr, "jmp %x", &valor);
         
-          printf("valor:%d\n", valor);
         }
         palavra |= opcode << 27;
         palavra |=0 << 23;
         palavra |= (valor & 0x7FFFFF);
-        mem[address++] = (palavra >> 24) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
+        
+	  mem[address++] = (palavra >> 24) & 0xFF;
           mem[address++] = (palavra >> 16) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
           mem[address++] = (palavra >> 8) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
           mem[address++] = palavra & 0xFF;
-
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
 
              } 
    
@@ -470,18 +376,11 @@ void preencher(FILE *file){
    if(tipo == 'd'){
         sscanf(line, "%x;%*[^;];%x", &address, &valor);
         palavra = valor;
-         mem[address++] = (palavra >> 24) & 0xFF;
          
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
+	  mem[address++] = (palavra >> 24) & 0xFF;
           mem[address++] = (palavra >> 16) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
           mem[address++] = (palavra >> 8) & 0xFF;
-         
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
           mem[address++] = palavra & 0xFF;
-
-        printf("MEM[%i]=%x\n",address, mem[address-1]);
        
     }  
 }
@@ -491,40 +390,28 @@ fclose(file);
 
 int extrair_numero_registrador(const char *instrucao) {
     const char *ptr = instrucao;
-    
     while (*ptr && *ptr != 'r') {
         ptr++;
     }
 
     if (*ptr == '\0' || !isdigit(*(ptr + 1))) {
-        return -1; // Retorna -1 se não encontrar 'r' ou não houver um número de registrador válido
+        return -1;   
     }
 
     return atoi(ptr + 1);
 }
 
-
 void busca(void){
   mar = pc;
-  printf("\npc:%x", pc);
-  printf("\nmar:%x", mar);
   mbr = mem[mar++];
-  printf("\nmar:%x", mar);
   mbr = (mbr<<8) + mem[mar++];
-  printf("\nmar:%x", mar);
   mbr = (mbr<<8) + mem[mar++];
-  printf("\nmar:%x", mar);
   mbr = (mbr<<8) + mem[mar++];
-  printf("\nmar:%x", mar);
-  printf("mbr: %x\n", mbr); 
 }
 
 
 void decodifica(void){
     ir = mbr>>27;
-     
-  
-
   if(ir == 0){
     x = false;
   }
@@ -538,9 +425,7 @@ void decodifica(void){
   if(ir == 3 || ir == 4){
     ro0 = (mbr>>23) & 0xF;
     ro1 = (mbr>>19) & 0xF;
-    printf("entrei cmp");
   }
-  //ldbo stbo
   if(ir == 5 || ir == 6){
      ro0 = (mbr>>23) & 0xF;
      ro1 = (mbr>>19) & 0xF; 
@@ -553,31 +438,24 @@ void decodifica(void){
      ro0 = (mbr>>23) & 0xF;
      ro1 = (mbr>>19) & 0xF;
      ro2 = (mbr>>15) & 0xF;
-     printf("%x %x %x", ro0, ro1, ro2);  
         
 }
 
  
-  //ld e st
   if(ir==14 || ir ==15){
     mar = mbr & 0xFF;    
     ro0 = (mbr >> 23) & 0xF;
-    printf("entrei ld ou st"); 
      
   }
   
  
-  //todos com imm
   if(ir >= 16 && ir<=23){
      ro0 = (mbr>>23) & 0xF; 
      imm =  mbr & 0x007FFFFF; 
-     printf("entrei addi");  
   }
   
 
-  //jumps *DUVIDA* jumps devem receber apenas -mar: endereco de memoria- ou devem receber tambem, assim como o load, o conteudo do endereco de memoria X.
   if(ir >=24 && ir<=30){
-    printf("entrei jle"); 
     mar = mbr & 0x007FFFFF;
 
   }
@@ -585,7 +463,6 @@ void decodifica(void){
 }
 
 void executa(void){
-   printf("\nmar:%x",mar); 
    if(ir == 1){
    incremento();
   }
@@ -628,12 +505,20 @@ void executa(void){
 }
 
    if(ir == 5){
-    reg[ro0] = (mem[mar]+reg[ro1]);
-  
+    
+    mbr = mem[reg[ro1]+mar++]; 
+    mbr = (mbr<<8) + mem[reg[ro1]+mar++]; 
+    mbr = (mbr<<8) + mem[reg[ro1]+mar++];
+    mbr = (mbr<<8) + mem[reg[ro1]+mar++];
+    reg[ro0] = mbr;
   }
 
   if(ir == 6){
-   /*(mem[mar]+reg[ro1]) = reg[ro0];*/
+     mbr = reg[ro0];
+     mem[mar+reg[ro1]] = mbr & 0xFF;
+     mem[++mar+reg[ro1]] = mbr>>8 & 0xFF;
+     mem[++mar+reg[ro1]] = mbr>>16 & 0xFF;
+     mem[++mar+reg[ro1]] = mbr>>24 & 0xFF;
   
   }
  
@@ -641,15 +526,12 @@ void executa(void){
     reg[ro0] = reg[ro1] + reg[ro2];
     
   
-    printf("\nSOMA - mem[ro1]:%i+mem[ro2]:%i", reg[ro1], reg[ro2]);   
   }
 
    if (ir == 8){
     reg[ro0] = reg[ro1] - reg[ro2];
 
   
-    printf("\nSUB - mem[ro1]:%x - mem[ro2]:%x", reg[ro1], reg[ro2]);   
-    printf("\n%i", reg[ro0]);
   }
 
    if(ir == 9){
@@ -657,14 +539,12 @@ void executa(void){
   
       
     
-    printf("\nMULT - mem[ro1]:%i * mem[ro2]:%i", reg[ro1], reg[ro2]);   
   }
 
    if(ir == 10){
     reg[ro0] = reg[ro1]/reg[ro2];
     
   
-    printf("\nDIV - mem[ro1]:%i/mem[ro2]:%i", reg[ro1], reg[ro2]);   
   }
   
    if(ir == 11){
@@ -680,7 +560,6 @@ void executa(void){
   
   } 
 
-  //LOAD
   if(ir == 14){
     mbr = mem[mar++]; 
     mbr = (mbr<<8) + mem[mar++]; 
@@ -699,9 +578,6 @@ void executa(void){
      mem[++mar] = mbr>>24 & 0xFF;
   
   }
-
-
-  
 
  if(ir == 16){
     reg[ro0] = 0;
@@ -795,13 +671,41 @@ void executa(void){
   
 
   if(!(ir>=24 && ir<=30)){
-    
-  pc = pc + 4;
+  
+	  pc = pc + 4;
   }
 
 }
 
-  void incremento(void){
-
+void incremento(void){
   pc = pc + 4;   
+}
+
+void imprimir(){
+  system("clear");  
+  printf("Registros:\n");
+    for (int i = 0; i < 16; ++i) {
+        printf("reg[%d]: 0x%X\n", i, reg[i]);
+    }
+
+    printf("\nMemória:\n");
+    for (int i = 0; i < 154;++i) {
+        printf("mem[%d]: 0x%X ", i, mem[i]);
+  }
+    printf("\nOutras variáveis:\n");
+    printf("MBR: 0x%X\n", mbr);
+    printf("MAR: 0x%X\n", mar);
+    printf("IMM: 0x%X\n", imm);
+    printf("PC: 0x%X\n", pc);
+    printf("IR: 0x%X\n", ir);
+    printf("RO0: 0x%X\n", ro0);
+    printf("RO1: 0x%X\n", ro1);
+    printf("RO2: 0x%X\n", ro2);
+    printf("E: 0x%X\n", e);
+    printf("L: 0x%X\n", l);
+    printf("G: 0x%X\n", g);
+    printf("\n\n Preciose enter para continuar o ciclo ou CTRL + C para encerrar o programa.");
+
+
+
 }
